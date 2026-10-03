@@ -75,3 +75,39 @@ func TestAnalyzeBytesEmptyCorpus(t *testing.T) {
 		t.Fatalf("expected probability of 0, got %f", stats.Probability('t'))
 	}
 }
+
+
+func TestAnalyzeBigrams(t *testing.T) {
+	data := []byte("ababac")
+
+	stats := analyzeBigrams(data)
+
+	if stats.Counts['a']['b'] != 2 {
+		t.Fatalf("expected a->b count of 2, got %d", stats.Counts['a']['b'])
+	}
+
+	if stats.TransitionTotals['a'] != 3 {
+		t.Fatalf("expected a total of 3, got %d", stats.TransitionTotals['a'])
+	}
+
+	if stats.Counts['b']['a'] != 2 {
+    	t.Fatalf("expected b->a count of 2, got %d", stats.Counts['b']['a'])
+	}
+
+	expected := 2.0 / 3.0 
+
+	if stats.Probability('a', 'b') != expected {
+		t.Fatalf("expected probability of %f, got %f", expected, stats.Probability('a', 'b'))
+	}
+}
+
+func TestZeroEdgeCaseBigrams(t *testing.T) {
+	data := []byte("abc")
+
+	stats := analyzeBigrams(data)
+	expected := 0.0
+
+	if stats.Probability('c', 'a') != expected {
+		t.Fatalf("expected probability of %f, got %f", expected, stats.Probability('c', 'a'))
+	}
+}
